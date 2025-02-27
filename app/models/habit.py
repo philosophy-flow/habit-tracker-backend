@@ -4,7 +4,7 @@ from typing import List, TYPE_CHECKING
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
-    from app.models.user import User
+    from app.models.user import UserDB
     from app.models.habit_completion import HabitCompletion
 
 
@@ -15,7 +15,7 @@ class Habit(SQLModel, table=True):
     user_id: uuid.UUID = Field(
         foreign_key="users.user_id", ondelete="CASCADE", nullable=False
     )
-    user: "User" = Relationship(back_populates="habits")
+    user: "UserDB" = Relationship(back_populates="habits")
     dates_completed: List["HabitCompletion"] = Relationship(back_populates="habit")
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc), nullable=False
