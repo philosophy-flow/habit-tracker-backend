@@ -6,7 +6,9 @@ from dotenv import load_dotenv
 from passlib.context import CryptContext
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from pydantic import SecretStr
+from sqlmodel import select, or_
 
+from app.models import UserDB
 from app.schemas.Email import VerifyEmail
 
 load_dotenv(override=True)
@@ -42,6 +44,25 @@ verification_email_conf = ConnectionConfig(
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+def get_user(db, username=None, email=None):
+    select_user = select(UserDB).where(
+        or_(UserDB.username == username, UserDB.email == email)
+    )
+    return db.exec(select_user).first()
+
+
+def get_temp_user(token, db):
+    payload = decode_token(token, "verify")
+    email = payload.get("email") if payload else None
+    username = payload.get("username") if payload else None
+    if email is None or username is None:
+        return None
+    user = get_user(db, email=email, username=username)
+    if user is None:
+        return None
+    return user
 
 
 def verify_password(plain_password, hashed_password):

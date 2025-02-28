@@ -1,7 +1,6 @@
 from typing import Annotated, Optional
 from fastapi import Depends, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
-from sqlmodel import select, or_
 
 from app.models import UserDB
 from app.schemas.user import UserRegister
@@ -13,53 +12,14 @@ from app.utils.auth import (
     generate_password_hash,
     generate_verification_email,
     send_verification_email,
+    get_user,
+    get_temp_user,
 )
 from app.db.session import SessionDep
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="authenticate")
 TokenDep = Annotated[str, Depends(oauth2_scheme)]
 FormDep = Annotated[OAuth2PasswordRequestForm, Depends()]
-
-
-def get_user(
-    db: SessionDep, username: Optional[str] = None, email: Optional[str] = None
-):
-    select_user = select(UserDB).where(
-        or_(UserDB.username == username, UserDB.email == email)
-    )
-    return db.exec(select_user).first()
-
-
-def get_temp_user(token: str, db: SessionDep):
-    payload = decode_token(token, "verify")
-    email = payload.get("email") if payload else None
-    username = payload.get("username") if payload else None
-    if email is None or username is None:
-        return None
-
-    token_data = TokenData(username=username, email=email)
-    user: Optional[UserDB] = get_user(
-        db, email=token_data.email, username=token_data.username
-    )
-    if user is None:
-        return None
-    return user
-
-
-def access_protected_route(token: TokenDep, db: SessionDep):
-    payload = decode_token(token, "auth")
-    email = payload.get("email") if payload else None
-    username = payload.get("username") if payload else None
-    if email is None or username is None:
-        return None
-
-    token_data = TokenData(username=username, email=email)
-    user: Optional[UserDB] = get_user(
-        db, email=token_data.email, username=token_data.username
-    )
-    if user is None:
-        return None
-    return user
 
 
 def authenticate_account(form_data: FormDep, db: SessionDep):
@@ -116,3 +76,19 @@ def verify_account(token: str, db: SessionDep):
     db.commit()
 
     return user.account_verified
+
+
+def access_protected_route(token: TokenDep, db: SessionDep):
+    payload = decode_token(token, "auth")
+    email = payload.get("email") if payload else None
+    username = payload.get("username") if payload else None
+    if email is None or username is None:
+        return None
+
+    token_data = TokenData(username=username, email=email)
+    user: Optional[UserDB] = get_user(
+        db, email=token_data.email, username=token_data.username
+    )
+    if user is None:
+        return None
+    return user
