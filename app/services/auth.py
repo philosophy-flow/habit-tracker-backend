@@ -1,5 +1,5 @@
 from typing import Annotated, Optional
-from fastapi import Depends
+from fastapi import Depends, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 from sqlmodel import select, or_
 
@@ -11,6 +11,8 @@ from app.utils.auth import (
     verify_password,
     decode_token,
     generate_password_hash,
+    generate_verification_email,
+    send_verification_email,
 )
 from app.db.session import SessionDep
 
@@ -77,7 +79,9 @@ def authenticate_account(form_data: FormDep, db: SessionDep):
     return auth_access_token
 
 
-def register_account(user: UserRegister, db: SessionDep):
+def register_account(
+    user: UserRegister, db: SessionDep, background_tasks: BackgroundTasks
+):
     if not user:
         return None
 
@@ -96,9 +100,10 @@ def register_account(user: UserRegister, db: SessionDep):
         data={"username": user.username, "email": user.email}, token_type="verify"
     )
     verify_access_token = VerifyToken(access_token=verify_jwt, token_type="bearer")
-    print(verify_access_token)
 
-    # send email with embedded jwt; will make GET request to /verify
+    verification_email = generate_verification_email(user, verify_access_token)
+    send_verification_email(verification_email, background_tasks)
+
     return True
 
 
