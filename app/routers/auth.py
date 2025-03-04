@@ -1,22 +1,19 @@
 from fastapi import APIRouter, HTTPException, status
 from app.dependencies.auth import AuthDep, RegisterDep, VerifyDep, AccessDep
+from app.schemas.user import UserAuthenticate
 
 router = APIRouter()
 
 
-@router.post("/authenticate")
-async def authenticate_account(token: AuthDep):
-    if not token:
+@router.post("/authenticate", response_model=UserAuthenticate)
+async def authenticate_account(user: AuthDep):
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password.",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return {
-        "message": "Account authenticated.",
-        "access_token": token.access_token,
-        "token_type": "bearer",
-    }
+    return user
 
 
 @router.post("/register")

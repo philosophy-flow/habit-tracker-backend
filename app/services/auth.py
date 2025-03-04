@@ -3,7 +3,7 @@ from fastapi import Depends, BackgroundTasks
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 from app.models import UserDB
-from app.schemas.user import UserRegister
+from app.schemas.user import User, UserRegister, UserAuthenticate
 from app.schemas.token import TokenData, AuthToken, VerifyToken
 from app.utils.auth import (
     generate_access_token,
@@ -22,7 +22,9 @@ TokenDep = Annotated[str, Depends(oauth2_scheme)]
 FormDep = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
-def authenticate_account(form_data: FormDep, db: SessionDep):
+def authenticate_account(
+    form_data: FormDep, db: SessionDep
+) -> Optional[UserAuthenticate]:
     user: Optional[UserDB] = get_user(db, form_data.username)
     if (
         not user
@@ -36,7 +38,15 @@ def authenticate_account(form_data: FormDep, db: SessionDep):
     )
     auth_access_token = AuthToken(access_token=access_jwt, token_type="bearer")
 
-    return auth_access_token
+    authenticated_user = User(
+        user_id=user.user_id,
+        email=user.email,
+        username=user.username,
+        profile_image_url=user.profile_image_url,
+        account_verified=user.account_verified,
+    )
+
+    return UserAuthenticate(token=auth_access_token, user=authenticated_user)
 
 
 def register_account(

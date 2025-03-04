@@ -1,6 +1,7 @@
 import uuid
 from pydantic import BaseModel, EmailStr
 from typing import Optional
+from app.schemas.token import AuthToken
 
 
 class User(BaseModel):
@@ -15,3 +16,8 @@ class UserRegister(BaseModel):
     email: EmailStr
     username: str
     password: str
+
+
+class UserAuthenticate(BaseModel):
+    token: AuthToken
+    user: User
