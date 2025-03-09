@@ -17,6 +17,8 @@ JWT_VERIFY_KEY = os.getenv("JWT_VERIFY_KEY")
 JWT_VERIFY_MINUTES = float(os.getenv("JWT_VERIFY_EXPIRE_MINUTES", "5"))
 JWT_AUTH_KEY = os.getenv("JWT_AUTH_KEY")
 JWT_AUTH_MINUTES = float(os.getenv("JWT_AUTH_EXPIRE_MINUTES", "20"))
+JWT_REFRESH_KEY = os.getenv("JWT_REFRESH_KEY")
+JWT_REFRESH_DAYS = float(os.getenv("JWT_REFRESH_DAYS", "5"))
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 
 
@@ -28,6 +30,11 @@ jwt_verify_config = {
 jwt_auth_config = {
     "key": JWT_AUTH_KEY,
     "time_diff": timedelta(minutes=JWT_AUTH_MINUTES),
+}
+
+jwt_refresh_config = {
+    "key": JWT_REFRESH_KEY,
+    "time_diff": timedelta(days=JWT_REFRESH_DAYS),
 }
 
 verification_email_conf = ConnectionConfig(
@@ -78,6 +85,8 @@ def generate_access_token(data, token_type):
         token_config = jwt_auth_config
     elif token_type == "verify":
         token_config = jwt_verify_config
+    elif token_type == "refresh":
+        token_config = jwt_refresh_config
 
     to_encode = data.copy()
     if token_config["time_diff"]:
@@ -94,6 +103,8 @@ def decode_token(token, token_type):
         key = jwt_auth_config["key"]
     elif token_type == "verify":
         key = jwt_verify_config["key"]
+    elif token_type == "refresh":
+        key = jwt_refresh_config["key"]
 
     try:
         return jwt.decode(token, key, algorithms=[JWT_ALGORITHM])

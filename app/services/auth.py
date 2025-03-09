@@ -1,9 +1,9 @@
 from typing import Annotated, Optional
-from fastapi import Depends, BackgroundTasks
+from fastapi import Depends, BackgroundTasks, Response
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 from app.models import UserDB
-from app.schemas.user import User, UserRegister, UserAuthenticate
+from app.schemas.user import UserRegister
 from app.schemas.token import TokenData, AuthToken, VerifyToken
 from app.utils.auth import (
     generate_access_token,
@@ -23,8 +23,8 @@ FormDep = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
 def authenticate_account(
-    form_data: FormDep, db: SessionDep
-) -> Optional[UserAuthenticate]:
+    form_data: FormDep, db: SessionDep, response: Response
+) -> Optional[AuthToken]:
     user: Optional[UserDB] = get_user(db, form_data.username)
     if (
         not user
@@ -33,20 +33,25 @@ def authenticate_account(
     ):
         return None
 
-    access_jwt = generate_access_token(
+    auth_jwt = generate_access_token(
         data={"username": user.username, "email": user.email}, token_type="auth"
     )
-    auth_access_token = AuthToken(access_token=access_jwt, token_type="bearer")
+    auth_token = AuthToken(auth_token=auth_jwt, token_type="bearer")
 
-    authenticated_user = User(
-        user_id=user.user_id,
-        email=user.email,
-        username=user.username,
-        profile_image_url=user.profile_image_url,
-        account_verified=user.account_verified,
+    refresh_jwt = generate_access_token(
+        data={"username": user.username, "email": user.email}, token_type="refresh"
     )
 
-    return UserAuthenticate(token=auth_access_token, user=authenticated_user)
+    # response.set_cookie(
+    #     key="refresh_token",
+    #     value=refresh_jwt,
+    #     httponly=True,
+    #     secure=True,
+    #     samesite="strict",
+    #     max_age=7 * 24 * 60 * 60,
+    # )
+
+    return auth_token
 
 
 def register_account(
@@ -69,9 +74,9 @@ def register_account(
     verify_jwt = generate_access_token(
         data={"username": user.username, "email": user.email}, token_type="verify"
     )
-    verify_access_token = VerifyToken(access_token=verify_jwt, token_type="bearer")
+    verify_token = VerifyToken(verify_token=verify_jwt, token_type="bearer")
 
-    verification_email = generate_verification_email(user, verify_access_token)
+    verification_email = generate_verification_email(user, verify_token)
     send_verification_email(verification_email, background_tasks)
 
     return True

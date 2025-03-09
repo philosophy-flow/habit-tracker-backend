@@ -8,12 +8,12 @@ class Token(BaseModel):
 
 
 class AuthToken(BaseModel):
-    access_token: str
+    auth_token: str
     token_type: str
 
 
 class VerifyToken(BaseModel):
-    access_token: str
+    verify_token: str
     token_type: str
 
 
