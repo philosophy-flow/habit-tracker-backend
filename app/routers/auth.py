@@ -1,11 +1,10 @@
 from fastapi import APIRouter, HTTPException, status
 from app.dependencies.auth import AuthDep, RegisterDep, VerifyDep, AccessDep
-from app.schemas.token import AuthToken
 
 router = APIRouter()
 
 
-@router.post("/authenticate", response_model=AuthToken)
+@router.post("/authenticate")
 async def authenticate_account(token: AuthDep):
     if not token:
         raise HTTPException(

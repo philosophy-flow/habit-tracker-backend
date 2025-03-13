@@ -9,7 +9,7 @@ from pydantic import SecretStr
 from sqlmodel import select, or_
 
 from app.models import UserDB
-from app.schemas.Email import VerifyEmail
+from app.schemas.email import VerifyEmail
 
 load_dotenv(override=True)
 

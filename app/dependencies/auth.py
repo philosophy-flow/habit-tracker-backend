@@ -2,7 +2,6 @@ from typing import Annotated, Optional
 from fastapi import Depends
 
 from app.schemas.token import AuthToken
-
 from app.services.auth import (
     authenticate_account,
     register_account,
