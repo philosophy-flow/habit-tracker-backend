@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
-from app.dependencies.auth import AuthDep, RegisterDep, VerifyDep, AccessDep
+from app.dependencies.auth import AuthDep, RegisterDep, VerifyDep, AccessDep, UserDep
 
 router = APIRouter()
 
@@ -35,6 +35,11 @@ async def verify_account(confirmation: VerifyDep):
             headers={"WWW-Authenticate": "Bearer"},
         )
     return {"message": "Account verified successfully."}
+
+
+@router.get("/user")
+async def get_active_user(user: UserDep):
+    return user
 
 
 @router.get("/protected-route-test")

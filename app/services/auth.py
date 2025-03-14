@@ -3,7 +3,7 @@ from fastapi import Depends, BackgroundTasks, Response
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 from app.models import UserDB
-from app.schemas.user import UserRegister
+from app.schemas.user import UserRegister, User
 from app.schemas.token import TokenData, AuthToken, VerifyToken
 from app.utils.auth import (
     generate_access_token,
@@ -91,6 +91,10 @@ def verify_account(token: str, db: SessionDep):
     db.commit()
 
     return user.account_verified
+
+
+def get_active_user() -> Optional[User]:
+    return None
 
 
 def access_protected_route(token: TokenDep, db: SessionDep):
