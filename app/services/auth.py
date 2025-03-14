@@ -12,8 +12,8 @@ from app.utils.auth import (
     generate_password_hash,
     generate_verification_email,
     send_verification_email,
+    get_db_user,
     get_user,
-    get_temp_user,
 )
 from app.db.session import SessionDep
 
@@ -25,7 +25,7 @@ FormDep = Annotated[OAuth2PasswordRequestForm, Depends()]
 def authenticate_account(
     form_data: FormDep, db: SessionDep, response: Response
 ) -> Optional[AuthToken]:
-    user: Optional[UserDB] = get_user(db, form_data.username)
+    user = get_db_user(db, form_data.username)
     if (
         not user
         or not verify_password(form_data.password, user.password_hash)
@@ -34,7 +34,7 @@ def authenticate_account(
         return None
 
     auth_jwt = generate_access_token(
-        data={"username": user.username, "email": user.email}, token_type="auth"
+        data={"username": user.username, "email": user.email}, token_type="access"
     )
     auth_token = AuthToken(access_token=auth_jwt, token_type="bearer")
 
@@ -83,7 +83,7 @@ def register_account(
 
 
 def verify_account(token: str, db: SessionDep):
-    user: Optional[UserDB] = get_temp_user(token, db)
+    user = get_user(token, db, "verify")
     if not user:
         return None
 
@@ -93,19 +93,22 @@ def verify_account(token: str, db: SessionDep):
     return user.account_verified
 
 
-def get_active_user() -> Optional[User]:
-    return None
+def get_active_user(token: TokenDep, db: SessionDep):
+    active_user = get_user(token, db, "access")
+    if not active_user:
+        return None
+    return active_user
 
 
 def access_protected_route(token: TokenDep, db: SessionDep):
-    payload = decode_token(token, "auth")
+    payload = decode_token(token, "access")
     email = payload.get("email") if payload else None
     username = payload.get("username") if payload else None
     if email is None or username is None:
         return None
 
     token_data = TokenData(username=username, email=email)
-    user: Optional[UserDB] = get_user(
+    user: Optional[UserDB] = get_db_user(
         db, email=token_data.email, username=token_data.username
     )
     if user is None:

@@ -7,9 +7,11 @@ from passlib.context import CryptContext
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from pydantic import SecretStr
 from sqlmodel import select, or_
+from typing import Union
 
 from app.models import UserDB
 from app.schemas.email import VerifyEmail
+from app.schemas.user import User
 
 load_dotenv(override=True)
 
@@ -53,23 +55,41 @@ verification_email_conf = ConnectionConfig(
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def get_user(db, username=None, email=None):
+def get_db_user(
+    db,
+    username=None,
+    email=None,
+) -> UserDB:
     select_user = select(UserDB).where(
         or_(UserDB.username == username, UserDB.email == email)
     )
     return db.exec(select_user).first()
 
 
-def get_temp_user(token, db):
-    payload = decode_token(token, "verify")
+def get_user(token, db, type) -> Union[UserDB, User, None]:
+    payload = decode_token(token, type)
     email = payload.get("email") if payload else None
     username = payload.get("username") if payload else None
     if email is None or username is None:
         return None
-    user = get_user(db, email=email, username=username)
+    user = get_db_user(
+        db,
+        email=email,
+        username=username,
+    )
     if user is None:
         return None
-    return user
+
+    if type == "verify":
+        return user
+    else:
+        return User(
+            user_id=user.user_id,
+            email=user.email,
+            username=user.username,
+            profile_image_url=user.profile_image_url,
+            account_verified=user.account_verified,
+        )
 
 
 def verify_password(plain_password, hashed_password):
@@ -81,7 +101,7 @@ def generate_password_hash(password):
 
 
 def generate_access_token(data, token_type):
-    if token_type == "auth":
+    if token_type == "access":
         token_config = jwt_auth_config
     elif token_type == "verify":
         token_config = jwt_verify_config
@@ -99,7 +119,7 @@ def generate_access_token(data, token_type):
 
 
 def decode_token(token, token_type):
-    if token_type == "auth":
+    if token_type == "access":
         key = jwt_auth_config["key"]
     elif token_type == "verify":
         key = jwt_verify_config["key"]
