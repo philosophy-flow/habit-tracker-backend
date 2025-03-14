@@ -36,7 +36,7 @@ def authenticate_account(
     auth_jwt = generate_access_token(
         data={"username": user.username, "email": user.email}, token_type="auth"
     )
-    auth_token = AuthToken(auth_token=auth_jwt, token_type="bearer")
+    auth_token = AuthToken(access_token=auth_jwt, token_type="bearer")
 
     refresh_jwt = generate_access_token(
         data={"username": user.username, "email": user.email}, token_type="refresh"
