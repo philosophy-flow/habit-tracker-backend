@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 from app.models import UserDB
 from app.schemas.user import UserRegister, User
-from app.schemas.token import TokenData, AuthToken, VerifyToken
+from app.schemas.token import TokenData, AuthToken, VerifyToken, RefreshToken
 from app.utils.auth import (
     generate_access_token,
     verify_password,
@@ -48,7 +48,7 @@ def authenticate_account(
         httponly=True,
         secure=True,
         samesite="strict",
-        max_age=7 * 24 * 60 * 60,
+        max_age=int(3.5 * 24 * 60 * 60),
     )
 
     return auth_token
@@ -91,6 +91,23 @@ def verify_account(token: str, db: SessionDep):
     db.commit()
 
     return user.account_verified
+
+
+def refresh_account(db: SessionDep):
+    # get cookie data
+
+    refresh_token = RefreshToken(token_type="refresh", refresh_token="1234")
+    refresh_user = get_user(refresh_token.refresh_token, db, refresh_token.token_type)
+
+    if refresh_user:
+        access_jwt = generate_access_token(
+            data={"username": refresh_user.username, "email": refresh_user.email},
+            token_type="access",
+        )
+        auth_token = AuthToken(access_token=access_jwt, token_type="bearer")
+        return auth_token
+    else:
+        return None
 
 
 def get_active_user(token: TokenDep, db: SessionDep):

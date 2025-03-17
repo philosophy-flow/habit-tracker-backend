@@ -1,6 +1,6 @@
 import os
 import jwt
-from jwt.exceptions import InvalidTokenError
+from jwt.exceptions import InvalidTokenError, InvalidSignatureError
 from datetime import datetime, timedelta, timezone
 from dotenv import load_dotenv
 from passlib.context import CryptContext
@@ -18,9 +18,9 @@ load_dotenv(override=True)
 JWT_VERIFY_KEY = os.getenv("JWT_VERIFY_KEY")
 JWT_VERIFY_MINUTES = float(os.getenv("JWT_VERIFY_EXPIRE_MINUTES", "5"))
 JWT_AUTH_KEY = os.getenv("JWT_AUTH_KEY")
-JWT_AUTH_MINUTES = float(os.getenv("JWT_AUTH_EXPIRE_MINUTES", "20"))
+JWT_AUTH_MINUTES = float(os.getenv("JWT_AUTH_EXPIRE_MINUTES", "15"))
 JWT_REFRESH_KEY = os.getenv("JWT_REFRESH_KEY")
-JWT_REFRESH_DAYS = float(os.getenv("JWT_REFRESH_DAYS", "5"))
+JWT_REFRESH_DAYS = float(os.getenv("JWT_REFRESH_DAYS", "3"))
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
 
 
@@ -128,6 +128,8 @@ def decode_token(token, token_type):
 
     try:
         return jwt.decode(token, key, algorithms=[JWT_ALGORITHM])
+    except InvalidSignatureError:
+        return None
     except InvalidTokenError:
         return None
 
