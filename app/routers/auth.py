@@ -1,5 +1,12 @@
 from fastapi import APIRouter, HTTPException, status
-from app.dependencies.auth import AuthDep, RegisterDep, VerifyDep, AccessDep, UserDep
+from app.dependencies.auth import (
+    AuthDep,
+    RegisterDep,
+    VerifyDep,
+    AccessDep,
+    RefreshDep,
+    UserDep,
+)
 
 router = APIRouter()
 
@@ -35,6 +42,17 @@ async def verify_account(confirmation: VerifyDep):
             headers={"WWW-Authenticate": "Bearer"},
         )
     return {"message": "Account verified successfully."}
+
+
+@router.get("/refresh")
+async def refresh_account(token: RefreshDep):
+    if not token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Expired or invalid token.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return token
 
 
 @router.get("/user")

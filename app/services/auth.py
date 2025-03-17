@@ -1,10 +1,10 @@
 from typing import Annotated, Optional
-from fastapi import Depends, BackgroundTasks, Response
+from fastapi import Depends, BackgroundTasks, Response, Cookie
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 from app.models import UserDB
 from app.schemas.user import UserRegister, User
-from app.schemas.token import TokenData, AuthToken, VerifyToken, RefreshToken
+from app.schemas.token import TokenData, AuthToken, VerifyToken
 from app.utils.auth import (
     generate_access_token,
     verify_password,
@@ -93,11 +93,8 @@ def verify_account(token: str, db: SessionDep):
     return user.account_verified
 
 
-def refresh_account(db: SessionDep):
-    # get cookie data
-
-    refresh_token = RefreshToken(token_type="refresh", refresh_token="1234")
-    refresh_user = get_user(refresh_token.refresh_token, db, refresh_token.token_type)
+def refresh_account(refresh_token: Annotated[str, Cookie()], db: SessionDep):
+    refresh_user = get_user(refresh_token, db, "refresh")
 
     if refresh_user:
         access_jwt = generate_access_token(
