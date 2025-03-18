@@ -37,6 +37,9 @@ async def refresh_account(token: RefreshDep):
     return token
 
 
-@router.post("/logout")
-async def logout_account():
-    print("logging out...")
+@router.get("/logout")
+async def logout_account(response: Response):
+    response.delete_cookie(
+        key="refresh_token", httponly=True, secure=True, samesite="strict"
+    )
+    return {"message": "Logout complete."}
