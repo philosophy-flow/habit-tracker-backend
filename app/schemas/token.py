@@ -17,6 +17,11 @@ class RefreshToken(BaseModel):
     token_type: str
 
 
+class TokenDict(BaseModel):
+    auth: AuthToken
+    refresh: RefreshToken
+
+
 class TokenData(BaseModel):
     username: Optional[str] = None
     email: Optional[str] = None

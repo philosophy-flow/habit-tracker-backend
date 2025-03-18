@@ -1,10 +1,10 @@
 from typing import Annotated, Optional
-from fastapi import Depends, BackgroundTasks, Response, Cookie
+from fastapi import Depends, BackgroundTasks, Cookie
 from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 from app.models import UserDB
-from app.schemas.user import UserRegister, User
-from app.schemas.token import TokenData, AuthToken, VerifyToken
+from app.schemas.user import UserRegister
+from app.schemas.token import TokenData, AuthToken, VerifyToken, RefreshToken, TokenDict
 from app.utils.auth import (
     generate_access_token,
     verify_password,
@@ -22,9 +22,7 @@ TokenDep = Annotated[str, Depends(oauth2_scheme)]
 FormDep = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
-def authenticate_account(
-    form_data: FormDep, db: SessionDep, response: Response
-) -> Optional[AuthToken]:
+def authenticate_account(form_data: FormDep, db: SessionDep) -> Optional[TokenDict]:
     user = get_db_user(db, form_data.username)
     if (
         not user
@@ -41,17 +39,10 @@ def authenticate_account(
     refresh_jwt = generate_access_token(
         data={"username": user.username, "email": user.email}, token_type="refresh"
     )
+    refresh_token = RefreshToken(refresh_token=refresh_jwt, token_type="refresh")
 
-    response.set_cookie(
-        key="refresh_token",
-        value=refresh_jwt,
-        httponly=True,
-        secure=True,
-        samesite="strict",
-        max_age=int(3.5 * 24 * 60 * 60),
-    )
-
-    return auth_token
+    tokens = TokenDict(auth=auth_token, refresh=refresh_token)
+    return tokens
 
 
 def register_account(
