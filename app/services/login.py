@@ -38,7 +38,10 @@ def authenticate_account(form_data: FormDep, db: SessionDep) -> Optional[TokenDi
     return tokens
 
 
-def refresh_account(refresh_token: Annotated[str, Cookie()], db: SessionDep):
+def refresh_account(
+    db: SessionDep,
+    refresh_token: Annotated[Optional[str], Cookie()] = None,
+) -> Optional[AuthToken]:
     refresh_user = get_user(refresh_token, db, "refresh")
 
     if refresh_user:

@@ -34,6 +34,7 @@ async def refresh_account(token: RefreshDep):
             detail="Expired or invalid token.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
     return token
 
 
@@ -42,4 +43,5 @@ async def logout_account(response: Response):
     response.delete_cookie(
         key="refresh_token", httponly=True, secure=True, samesite="strict"
     )
+
     return {"message": "Logout complete."}

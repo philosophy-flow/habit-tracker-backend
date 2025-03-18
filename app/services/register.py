@@ -15,36 +15,39 @@ from app.db.session import SessionDep
 
 def register_account(
     user: UserRegister, db: SessionDep, background_tasks: BackgroundTasks
-):
+) -> bool:
     if not user:
-        return None
+        return False
 
-    temp_user = UserDB(
-        email=user.email,
-        username=user.username,
-        password_hash=generate_password_hash(user.password),
-        account_verified=False,
-    )
+    try:
+        temp_user = UserDB(
+            email=user.email,
+            username=user.username,
+            password_hash=generate_password_hash(user.password),
+            account_verified=False,
+        )
 
-    db.add(temp_user)
-    db.commit()
-    db.refresh(temp_user)
+        db.add(temp_user)
+        db.commit()
+        db.refresh(temp_user)
 
-    verify_jwt = generate_access_token(
-        data={"username": user.username, "email": user.email}, token_type="verify"
-    )
-    verify_token = VerifyToken(verify_token=verify_jwt, token_type="bearer")
+        verify_jwt = generate_access_token(
+            data={"username": user.username, "email": user.email}, token_type="verify"
+        )
+        verify_token = VerifyToken(verify_token=verify_jwt, token_type="verify")
 
-    verification_email = generate_verification_email(user, verify_token)
-    send_verification_email(verification_email, background_tasks)
+        verification_email = generate_verification_email(user, verify_token)
+        send_verification_email(verification_email, background_tasks)
+    except:
+        return False
 
     return True
 
 
-def verify_account(token: str, db: SessionDep):
+def verify_account(token: str, db: SessionDep) -> bool:
     user = get_user(token, db, "verify")
     if not user:
-        return None
+        return False
 
     user.account_verified = True
     db.commit()

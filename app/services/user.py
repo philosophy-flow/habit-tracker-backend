@@ -4,6 +4,7 @@ from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 from app.models import UserDB
 from app.schemas.token import TokenData
+from app.schemas.user import User
 from app.utils.auth import (
     decode_token,
     get_db_user,
@@ -17,8 +18,8 @@ TokenDep = Annotated[str, Depends(oauth2_scheme)]
 FormDep = Annotated[OAuth2PasswordRequestForm, Depends()]
 
 
-def get_active_user(token: TokenDep, db: SessionDep):
-    active_user = get_user(token, db, "access")
+def get_active_user(token: TokenDep, db: SessionDep) -> Optional[User]:
+    active_user: Optional[User] = get_user(token, db, "access")
     if not active_user:
         return None
     return active_user

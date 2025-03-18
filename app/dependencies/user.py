@@ -7,5 +7,6 @@ from app.services.user import (
     get_active_user,
 )
 
+
 AccessDep = Annotated[str, Depends(access_protected_route)]
 UserDep = Annotated[Optional[User], Depends(get_active_user)]

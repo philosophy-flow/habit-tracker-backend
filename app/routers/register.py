@@ -13,9 +13,10 @@ async def register_account(confirmation: RegisterDep):
     if not confirmation:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Unable to register account",
+            detail="Unable to register account.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
     return {"message": "Account created; check email to verify."}
 
 
@@ -24,7 +25,8 @@ async def verify_account(confirmation: VerifyDep):
     if not confirmation:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Unable to verify account",
+            detail="Unable to verify account.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
     return {"message": "Account verified successfully."}

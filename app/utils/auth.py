@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from pydantic import SecretStr
 from sqlmodel import select, or_
-from typing import Union
+from typing import Literal, Optional, Union, overload
 
 from app.models import UserDB
 from app.schemas.email import VerifyEmail
@@ -66,23 +66,31 @@ def get_db_user(
     return db.exec(select_user).first()
 
 
+@overload
+def get_user(token, db, type: Literal["verify"]) -> Optional[UserDB]: ...
+@overload
+def get_user(token, db, type: Literal["access"]) -> Optional[User]: ...
+@overload
+def get_user(token, db, type: Literal["refresh"]) -> Optional[User]: ...
 def get_user(token, db, type) -> Union[UserDB, User, None]:
     payload = decode_token(token, type)
     email = payload.get("email") if payload else None
     username = payload.get("username") if payload else None
+
     if email is None or username is None:
         return None
-    user = get_db_user(
+    user: UserDB = get_db_user(
         db,
         email=email,
         username=username,
     )
+
     if user is None:
         return None
 
     if type == "verify":
         return user
-    else:
+    elif type == "access" or type == "refresh":
         return User(
             user_id=user.user_id,
             email=user.email,
@@ -144,7 +152,7 @@ def generate_verification_email(user, token):
             <p>Hi {user.username}.</p>
             <p>Thanks for creating an account. Click the link below to verify.</p>
             <hr/>
-            <a href="http://localhost:8000/verify?token={token.access_token}">Verify</a>
+            <a href="https://localhost:8000/verify?token={token.verify_token}">Verify</a>
         </body>
         """,
     )
