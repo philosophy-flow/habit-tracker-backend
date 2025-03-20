@@ -5,10 +5,10 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.schemas.token import AuthToken, RefreshToken, TokenDict
 from app.utils.auth import (
     generate_access_token,
-    verify_password,
     get_db_user,
     get_user,
 )
+from app.utils.verify import verify_password
 from app.db.session import SessionDep
 
 

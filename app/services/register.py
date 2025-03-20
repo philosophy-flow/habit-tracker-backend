@@ -5,10 +5,12 @@ from app.schemas.user import UserRegister
 from app.schemas.token import VerifyToken
 from app.utils.auth import (
     generate_access_token,
+    get_user,
+)
+from app.utils.verify import (
     generate_password_hash,
     generate_verification_email,
     send_verification_email,
-    get_user,
 )
 from app.db.session import SessionDep
 
