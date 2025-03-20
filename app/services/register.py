@@ -1,4 +1,5 @@
 from fastapi import BackgroundTasks
+from typing import Optional
 
 from app.models import UserDB
 from app.schemas.user import UserRegister
@@ -16,7 +17,7 @@ from app.db.session import SessionDep
 
 
 def register_account(
-    user: UserRegister, db: SessionDep, background_tasks: BackgroundTasks
+    user: Optional[UserRegister], db: SessionDep, background_tasks: BackgroundTasks
 ) -> bool:
     if not user:
         return False
