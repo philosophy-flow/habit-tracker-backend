@@ -30,4 +30,6 @@ async def verify_account(confirmation: VerifyDep):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return RedirectResponse(url="https://localhost:3000/login")
+    return RedirectResponse(
+        url="https://localhost:3000/login", status_code=status.HTTP_303_SEE_OTHER
+    )
