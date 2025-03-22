@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, status
+from fastapi.responses import RedirectResponse
 from app.dependencies.register import (
     RegisterDep,
     VerifyDep,
@@ -29,4 +30,4 @@ async def verify_account(confirmation: VerifyDep):
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return {"message": "Account verified successfully."}
+    return RedirectResponse(url="https://localhost:3000/login")
