@@ -4,7 +4,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import login, register, user
 
 
-app = FastAPI()
+app = FastAPI(
+    openapi_url="/api/openapi.json", docs_url="/api/docs", redoc_url="/api/redoc"
+)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://localhost:3000"],
@@ -12,6 +14,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(login.router)
-app.include_router(register.router)
-app.include_router(user.router)
+app.include_router(login.router, prefix="/api")
+app.include_router(register.router, prefix="/api")
+app.include_router(user.router, prefix="/api")
