@@ -1,7 +1,8 @@
-from fastapi import APIRouter
+import uuid
+from typing import Optional
+from fastapi import APIRouter, HTTPException
 
 from app.db.session import SessionDep
-
 from app.schemas.habit import HabitAdd
 from app.models.habit import HabitDB
 
@@ -17,10 +18,20 @@ def create_habit(habit: HabitAdd, db: SessionDep):
     db.commit()
     db.refresh(habit_db)
 
-    return {"message": "Habit created.", "habit_id": habit_db.habit_id}
+    return habit_db
 
 
 # delete habit
+@router.delete("/delete-habit/{habit_id}")
+def delete_habit(habit_id: uuid.UUID, db: SessionDep):
+    habit = db.get(HabitDB, habit_id)
+    if not habit:
+        raise HTTPException(status_code=404, detail="Habit not found.")
+
+    db.delete(habit)
+    db.commit()
+    return {"message": "Habit deleted."}
+
 
 # edit habit
 #    change name
