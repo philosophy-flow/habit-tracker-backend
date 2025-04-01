@@ -4,7 +4,7 @@ from typing import List, Optional, TYPE_CHECKING
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
-    from app.models.habit import Habit
+    from app.models.habit import HabitDB
 
 
 class UserDB(SQLModel, table=True):
@@ -14,7 +14,7 @@ class UserDB(SQLModel, table=True):
     username: str = Field(unique=True, max_length=50, nullable=False)
     password_hash: str = Field(max_length=255, nullable=False)
     profile_image_url: Optional[str] = Field(default=None, max_length=512)
-    habits: List["Habit"] = Relationship(back_populates="user")
+    habits: List["HabitDB"] = Relationship(back_populates="user")
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc), nullable=False
     )
