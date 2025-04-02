@@ -13,7 +13,7 @@ from app.utils.verify import (
     generate_verification_email,
     send_verification_email,
 )
-from app.db.session import SessionDep
+from app.dependencies.sub import SessionDep
 
 
 def register_account(

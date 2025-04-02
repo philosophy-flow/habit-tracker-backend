@@ -1,17 +1,11 @@
-from typing import Annotated, Optional
+from typing import Optional
 from fastapi import Depends
-from fastapi.security import OAuth2PasswordRequestForm, OAuth2PasswordBearer
 
 from app.schemas.user import User
 from app.utils.auth import (
     get_user,
 )
-from app.db.session import SessionDep
-
-
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="authenticate")
-TokenDep = Annotated[str, Depends(oauth2_scheme)]
-FormDep = Annotated[OAuth2PasswordRequestForm, Depends()]
+from app.dependencies.sub import TokenDep, SessionDep
 
 
 def get_active_user(token: TokenDep, db: SessionDep) -> Optional[User]:

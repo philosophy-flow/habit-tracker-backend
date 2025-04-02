@@ -1,6 +1,5 @@
 from typing import Annotated, Optional
-from fastapi import Depends, Cookie
-from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import Cookie
 
 from app.schemas.token import AuthToken, RefreshToken, TokenDict
 from app.utils.auth import (
@@ -9,10 +8,7 @@ from app.utils.auth import (
     get_user,
 )
 from app.utils.verify import verify_password
-from app.db.session import SessionDep
-
-
-FormDep = Annotated[OAuth2PasswordRequestForm, Depends()]
+from app.dependencies.sub import FormDep, SessionDep
 
 
 def authenticate_account(form_data: FormDep, db: SessionDep) -> Optional[TokenDict]:
