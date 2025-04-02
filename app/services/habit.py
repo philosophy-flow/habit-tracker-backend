@@ -1,3 +1,4 @@
+import uuid
 from typing import Optional
 from app.db.session import SessionDep
 from app.schemas.habit import HabitAdd, HabitResponse
@@ -27,3 +28,15 @@ def create_habit(
     )
 
     return habit_response
+
+
+def delete_habit(habit_id: uuid.UUID, db: SessionDep, token: TokenDep):
+    user = get_user(token, db, "access")
+    habit = db.get(HabitDB, habit_id)
+    if not habit or not user or habit.user_id != user.user_id:
+        return False
+
+    db.delete(habit)
+    db.commit()
+
+    return True
