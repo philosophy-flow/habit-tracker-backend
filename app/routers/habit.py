@@ -1,12 +1,13 @@
 from fastapi import APIRouter, HTTPException
 from app.dependencies.habit import CreateDep, DeleteDep
+from app.schemas.habit import HabitResponse
 
 
 router = APIRouter()
 
 
 # create habit
-@router.post("/create-habit")
+@router.post("/create-habit", response_model=HabitResponse)
 def create_habit(habit: CreateDep):
     return habit
 
