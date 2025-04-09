@@ -2,7 +2,7 @@ import jwt
 from jwt.exceptions import InvalidTokenError, InvalidSignatureError
 from datetime import datetime, timedelta, timezone
 from sqlmodel import select, or_
-from typing import Literal, Optional, Union, overload
+from typing import Optional
 
 from app.config.auth import (
     jwt_auth_config,
@@ -10,7 +10,6 @@ from app.config.auth import (
     jwt_refresh_config,
 )
 from app.models import UserDB
-from app.schemas.user import User
 
 
 def get_db_user(
@@ -24,13 +23,7 @@ def get_db_user(
     return db.exec(select_user).first()
 
 
-@overload
-def get_user(token, db, type: Literal["verify"]) -> Optional[UserDB]: ...
-@overload
-def get_user(token, db, type: Literal["access"]) -> Optional[User]: ...
-@overload
-def get_user(token, db, type: Literal["refresh"]) -> Optional[User]: ...
-def get_user(token, db, type) -> Union[UserDB, User, None]:
+def get_user(token, db, type) -> Optional[UserDB]:
     payload = decode_token(token, type)
     email = payload.get("email") if payload else None
     username = payload.get("username") if payload else None
@@ -44,18 +37,7 @@ def get_user(token, db, type) -> Union[UserDB, User, None]:
         username=username,
     )
 
-    if user is None:
-        return None
-    elif type == "verify":
-        return user
-    elif type == "access" or type == "refresh":
-        return User(
-            user_id=user.user_id,
-            email=user.email,
-            username=user.username,
-            profile_image_url=user.profile_image_url,
-            account_verified=user.account_verified,
-        )
+    return user
 
 
 def generate_access_token(data, token_type):
