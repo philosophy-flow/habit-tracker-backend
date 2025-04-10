@@ -1,6 +1,8 @@
 import uuid
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional, List
+
+from app.schemas.habit import HabitResponse
 
 
 class User(BaseModel):
@@ -9,6 +11,7 @@ class User(BaseModel):
     username: str
     profile_image_url: Optional[str] = None
     account_verified: bool = False
+    habits: List[HabitResponse] = []
 
 
 class UserRegister(BaseModel):

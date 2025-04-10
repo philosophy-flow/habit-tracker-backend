@@ -11,6 +11,7 @@ from app.config.auth import (
 )
 from app.models import UserDB
 from app.schemas.user import User
+from app.schemas.habit import HabitResponse
 
 
 def get_db_user(
@@ -49,12 +50,18 @@ def get_user(token, db, type) -> Union[UserDB, User, None]:
     elif type == "verify":
         return user
     elif type == "access" or type == "refresh":
+        response_habits = [
+            HabitResponse.model_validate(habit, from_attributes=True)
+            for habit in user.habits
+        ]
+
         return User(
             user_id=user.user_id,
             email=user.email,
             username=user.username,
             profile_image_url=user.profile_image_url,
             account_verified=user.account_verified,
+            habits=response_habits,
         )
 
 
