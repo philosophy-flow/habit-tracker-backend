@@ -57,12 +57,15 @@ def get_user(token, db, type) -> Union[UserDB, User, None]:
 
         response_habits_flat: List[HabitResponseFlat] = []
         for habit in response_habits:
+            flat_dates_completed = [
+                complete.date_completed for complete in habit.dates_completed
+            ]
+            flat_dates_completed.sort()
+
             flat_habit = HabitResponseFlat(
                 name=habit.name,
                 habit_id=habit.habit_id,
-                dates_completed=[
-                    complete.date_completed for complete in habit.dates_completed
-                ],
+                dates_completed=flat_dates_completed,
             )
             response_habits_flat.append(flat_habit)
 
