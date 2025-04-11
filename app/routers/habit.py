@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from app.dependencies.habit import CreateDep, DeleteDep
+from app.dependencies.habit import CreateDep, DeleteDep, CompleteDep
 
 
 router = APIRouter()
@@ -10,7 +10,7 @@ router = APIRouter()
 @router.post("/create-habit")
 def create_habit(success: CreateDep):
     if not success:
-        raise HTTPException(status_code=404, detail="Could not create habit.")
+        raise HTTPException(status_code=500, detail="Could not create habit.")
 
     return {"message": "Habit created."}
 
@@ -24,7 +24,11 @@ def delete_habit(success: DeleteDep):
     return {"message": "Habit deleted."}
 
 
-# handles completion toggles, modifies habit_completion table
-# @router.put("/update-habit/{habit_id}/completions/{date}")
-# def update_habit_completions():
-#     print("Updating completion")
+@router.put("/update-habit/{habit_id}/completions/{date_completed}")
+def update_habit_completions(success: CompleteDep):
+    if not success:
+        raise HTTPException(
+            status_code=500, detail="Unable to update habit completion status."
+        )
+
+    return {"message": f"Habit completion status updated."}
