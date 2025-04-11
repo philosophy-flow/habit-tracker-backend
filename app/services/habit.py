@@ -12,7 +12,7 @@ def create_habit(habit: HabitAdd, db: SessionDep, token: TokenDep):
     if not user:
         return False
 
-    habit_db = HabitDB(name=habit.name, user_id=user.user_id)
+    habit_db = HabitDB(name=habit.name, user_id=user.user_id, frequency=habit.frequency)
 
     db.add(habit_db)
     db.commit()
@@ -66,7 +66,6 @@ def update_habit_complete(
 def update_habit_metadata(
     habit_id: uuid.UUID, updated_data: HabitUpdate, db: SessionDep, token: TokenDep
 ):
-    print("updating metadata ..")
     user = get_user(token, db, "access")
     if not user:
         return False
