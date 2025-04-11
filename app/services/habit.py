@@ -7,6 +7,14 @@ from app.dependencies.sub import TokenDep
 from app.utils.auth import get_user
 
 
+def get_habits(db: SessionDep, token: TokenDep):
+    user = get_user(token, db, "access")
+    if not user:
+        return False
+
+    return user.habits
+
+
 def create_habit(habit: HabitAdd, db: SessionDep, token: TokenDep):
     user = get_user(token, db, "access")
     if not user:

@@ -14,6 +14,14 @@ class User(BaseModel):
     habits: List[HabitResponseFlat] = []
 
 
+class UserResponse(BaseModel):
+    user_id: uuid.UUID
+    email: EmailStr
+    username: str
+    profile_image_url: Optional[str] = None
+    account_verified: bool = False
+
+
 class UserRegister(BaseModel):
     email: EmailStr
     username: str
