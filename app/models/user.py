@@ -14,7 +14,9 @@ class UserDB(SQLModel, table=True):
     username: str = Field(unique=True, max_length=50, nullable=False)
     password_hash: str = Field(max_length=255, nullable=False)
     profile_image_url: Optional[str] = Field(default=None, max_length=512)
-    habits: List["HabitDB"] = Relationship(back_populates="user")
+    habits: List["HabitDB"] = Relationship(
+        back_populates="user", sa_relationship_kwargs={"order_by": "HabitDB.name"}
+    )
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc), nullable=False
     )

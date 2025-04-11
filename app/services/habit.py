@@ -1,7 +1,7 @@
 import uuid
 from datetime import date
 from app.db.session import SessionDep
-from app.schemas.habit import HabitAdd
+from app.schemas.habit import HabitAdd, HabitUpdate
 from app.models import HabitDB, HabitCompletionDB
 from app.dependencies.sub import TokenDep
 from app.utils.auth import get_user
@@ -61,3 +61,25 @@ def update_habit_complete(
         db.commit()
 
         return True
+
+
+def update_habit_metadata(
+    habit_id: uuid.UUID, updated_data: HabitUpdate, db: SessionDep, token: TokenDep
+):
+    print("updating metadata ..")
+    user = get_user(token, db, "access")
+    if not user:
+        return False
+
+    habit = db.get(HabitDB, habit_id)
+    if not habit or habit.user_id != user.user_id:
+        return False
+
+    for key, value in updated_data:
+        if value:
+            setattr(habit, key, value)
+
+    db.commit()
+    db.refresh(habit)
+
+    return True

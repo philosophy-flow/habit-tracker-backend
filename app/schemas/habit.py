@@ -1,5 +1,5 @@
 import uuid
-from typing import List
+from typing import List, Optional
 from datetime import date
 from pydantic import BaseModel
 
@@ -22,3 +22,7 @@ class HabitResponseFlat(BaseModel):
     habit_id: uuid.UUID
     name: str
     dates_completed: List[date]
+
+
+class HabitUpdate(BaseModel):
+    name: Optional[str] = None

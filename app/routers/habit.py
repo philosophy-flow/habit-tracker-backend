@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from app.dependencies.habit import CreateDep, DeleteDep, CompleteDep
+from app.dependencies.habit import CreateDep, DeleteDep, CompleteDep, UpdateDep
 
 
 router = APIRouter()
@@ -32,3 +32,11 @@ def update_habit_completions(success: CompleteDep):
         )
 
     return {"message": f"Habit completion status updated."}
+
+
+@router.patch("/update-habit/{habit_id}")
+def update_habit_metadata(success: UpdateDep):
+    if not success:
+        raise HTTPException(status_code=500, detail="Unable to update habit metadata.")
+
+    return {"message": "Habit metadata updated."}
