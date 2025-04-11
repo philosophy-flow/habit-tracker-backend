@@ -7,13 +7,11 @@ from app.dependencies.sub import TokenDep
 from app.utils.auth import get_user
 
 
-def create_habit(
-    habit: HabitAdd, db: SessionDep, token: TokenDep
-) -> Optional[HabitResponse]:
+def create_habit(habit: HabitAdd, db: SessionDep, token: TokenDep):
     active_user = get_user(token, db, "access")
     if not active_user:
         print("User not found")
-        return None
+        return False
 
     habit_db = HabitDB(name=habit.name, user_id=active_user.user_id)
 
@@ -21,13 +19,7 @@ def create_habit(
     db.commit()
     db.refresh(habit_db)
 
-    habit_response = HabitResponse(
-        habit_id=habit_db.habit_id,
-        name=habit_db.name,
-        dates_completed=[],
-    )
-
-    return habit_response
+    return True
 
 
 def delete_habit(habit_id: uuid.UUID, db: SessionDep, token: TokenDep):
