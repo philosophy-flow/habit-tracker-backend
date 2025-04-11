@@ -2,7 +2,7 @@ import jwt
 from jwt.exceptions import InvalidTokenError, InvalidSignatureError
 from datetime import datetime, timedelta, timezone
 from sqlmodel import select, or_
-from typing import Literal, Optional, Union, overload
+from typing import Literal, Optional, Union, overload, List
 
 from app.config.auth import (
     jwt_auth_config,
@@ -11,7 +11,7 @@ from app.config.auth import (
 )
 from app.models import UserDB
 from app.schemas.user import User
-from app.schemas.habit import HabitResponse
+from app.schemas.habit import HabitResponse, HabitResponseFlat
 
 
 def get_db_user(
@@ -55,13 +55,24 @@ def get_user(token, db, type) -> Union[UserDB, User, None]:
             for habit in user.habits
         ]
 
+        response_habits_flat: List[HabitResponseFlat] = []
+        for habit in response_habits:
+            flat_habit = HabitResponseFlat(
+                name=habit.name,
+                habit_id=habit.habit_id,
+                dates_completed=[
+                    complete.date_completed for complete in habit.dates_completed
+                ],
+            )
+            response_habits_flat.append(flat_habit)
+
         return User(
             user_id=user.user_id,
             email=user.email,
             username=user.username,
             profile_image_url=user.profile_image_url,
             account_verified=user.account_verified,
-            habits=response_habits,
+            habits=response_habits_flat,
         )
 
 

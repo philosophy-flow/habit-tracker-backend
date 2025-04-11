@@ -16,7 +16,9 @@ class HabitDB(SQLModel, table=True):
         foreign_key="users.user_id", ondelete="CASCADE", nullable=False
     )
     user: "UserDB" = Relationship(back_populates="habits")
-    dates_completed: List["HabitCompletionDB"] = Relationship(back_populates="habit")
+    dates_completed: List["HabitCompletionDB"] = Relationship(
+        back_populates="habit", cascade_delete=True
+    )
     created_at: datetime = Field(
         default_factory=lambda: datetime.now(timezone.utc), nullable=False
     )
