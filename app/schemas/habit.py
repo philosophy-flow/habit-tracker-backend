@@ -1,6 +1,6 @@
 import uuid
 from typing import List, Optional
-from datetime import date
+from datetime import date, datetime
 from pydantic import BaseModel
 
 from app.models.habit import Weekdays
@@ -20,6 +20,7 @@ class HabitResponse(BaseModel):
     name: str
     frequency: List[Weekdays]
     dates_completed: List[HabitCompletion]
+    created_at: datetime
 
 
 class HabitResponseFlat(BaseModel):
@@ -27,6 +28,7 @@ class HabitResponseFlat(BaseModel):
     name: str
     frequency: List[Weekdays]
     dates_completed: List[date]
+    created_at: date
 
 
 class HabitUpdate(BaseModel):

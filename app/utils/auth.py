@@ -67,6 +67,7 @@ def get_user(token, db, type) -> Union[UserDB, User, None]:
                 habit_id=habit.habit_id,
                 frequency=habit.frequency,
                 dates_completed=flat_dates_completed,
+                created_at=habit.created_at.date(),
             )
             response_habits_flat.append(flat_habit)
 
