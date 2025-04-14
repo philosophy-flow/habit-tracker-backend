@@ -8,8 +8,8 @@ router = APIRouter()
 
 @router.get("/get-habits")
 def get_habits(habits: GetDep):
-    if not habits:
-        raise HTTPException(status_code=500, detail="Could not create habit.")
+    if not isinstance(habits, list):
+        raise HTTPException(status_code=500, detail="Could not get habits.")
 
     return habits
 

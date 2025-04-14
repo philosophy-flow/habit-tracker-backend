@@ -1,4 +1,4 @@
-from typing import Annotated, List
+from typing import Annotated, List, Optional
 from fastapi import Depends
 
 from app.services.habit import (
@@ -10,7 +10,7 @@ from app.services.habit import (
 )
 from app.schemas.habit import HabitResponseFlat
 
-GetDep = Annotated[List[HabitResponseFlat], Depends(get_habits)]
+GetDep = Annotated[Optional[List[HabitResponseFlat]], Depends(get_habits)]
 CreateDep = Annotated[bool, Depends(create_habit)]
 DeleteDep = Annotated[bool, Depends(delete_habit)]
 CompleteDep = Annotated[bool, Depends(update_habit_complete)]
