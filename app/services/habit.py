@@ -3,7 +3,7 @@ from datetime import date
 from app.db.session import SessionDep
 from app.schemas.habit import HabitAdd, HabitUpdate
 from app.models import HabitDB, HabitCompletionDB
-from app.dependencies.sub import TokenDep
+from app.dependencies.shared import TokenDep
 from app.utils.auth import get_user
 
 

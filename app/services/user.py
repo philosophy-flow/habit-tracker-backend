@@ -5,7 +5,7 @@ from app.schemas.user import User, UserResponse
 from app.utils.auth import (
     get_user,
 )
-from app.dependencies.sub import TokenDep, SessionDep
+from app.dependencies.shared import TokenDep, SessionDep
 
 
 def get_active_user(token: TokenDep, db: SessionDep) -> Optional[UserResponse]:

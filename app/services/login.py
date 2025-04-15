@@ -8,7 +8,7 @@ from app.utils.auth import (
     get_user,
 )
 from app.utils.verify import verify_password
-from app.dependencies.sub import FormDep, SessionDep
+from app.dependencies.shared import FormDep, SessionDep
 
 
 def authenticate_account(form_data: FormDep, db: SessionDep) -> Optional[TokenDict]:
