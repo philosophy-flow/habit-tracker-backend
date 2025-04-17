@@ -10,9 +10,7 @@ load_dotenv(override=True)
 CLIENT_URL = str(os.getenv("CLIENT_URL"))
 
 
-app = FastAPI(
-    openapi_url="/api/openapi.json", docs_url="/api/docs", redoc_url="/api/redoc"
-)
+app = FastAPI(openapi_url="/openapi.json", docs_url="/docs", redoc_url="/redoc")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[CLIENT_URL],
@@ -20,7 +18,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(login.router, prefix="/api")
-app.include_router(register.router, prefix="/api")
-app.include_router(user.router, prefix="/api")
-app.include_router(habit.router, prefix="/api")
+app.include_router(login.router)
+app.include_router(register.router)
+app.include_router(user.router)
+app.include_router(habit.router)

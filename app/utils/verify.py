@@ -20,7 +20,7 @@ def generate_verification_email(user, token):
             <p>Hi {user.username}.</p>
             <p>Thanks for creating an account. Click the link below to verify.</p>
             <hr/>
-            <a href="{SERVER_URL}/api/verify?token={token.verify_token}">Verify</a>
+            <a href="{SERVER_URL}/verify?token={token.verify_token}">Verify</a>
         </body>
         """,
     )
