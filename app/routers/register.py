@@ -1,3 +1,5 @@
+import os
+from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException, status
 from fastapi.responses import RedirectResponse
 from app.dependencies.register import (
@@ -5,6 +7,9 @@ from app.dependencies.register import (
     VerifyDep,
 )
 
+
+load_dotenv(override=True)
+CLIENT_URL = str(os.getenv("CLIENT_URL"))
 
 router = APIRouter()
 
@@ -31,5 +36,5 @@ async def verify_account(confirmation: VerifyDep):
         )
 
     return RedirectResponse(
-        url="https://localhost:3000/login", status_code=status.HTTP_303_SEE_OTHER
+        url=f"{CLIENT_URL}/login", status_code=status.HTTP_303_SEE_OTHER
     )

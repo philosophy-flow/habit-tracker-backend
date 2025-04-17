@@ -1,7 +1,13 @@
+import os
+from dotenv import load_dotenv
 from app.schemas.email import VerifyEmail
 from fastapi_mail import FastMail, MessageSchema, MessageType
 
 from app.config.verify import verification_email_conf, pwd_context
+
+
+load_dotenv(override=True)
+SERVER_URL = str(os.getenv("SERVER_URL"))
 
 
 def generate_verification_email(user, token):
@@ -14,7 +20,7 @@ def generate_verification_email(user, token):
             <p>Hi {user.username}.</p>
             <p>Thanks for creating an account. Click the link below to verify.</p>
             <hr/>
-            <a href="https://localhost:8000/api/verify?token={token.verify_token}">Verify</a>
+            <a href="{SERVER_URL}/api/verify?token={token.verify_token}">Verify</a>
         </body>
         """,
     )
