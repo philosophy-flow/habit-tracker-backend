@@ -22,11 +22,12 @@ class Weekdays(str, Enum):
 
 
 class HabitDB(SQLModel, table=True):
+    __table_args__ = {"schema": "habitsior"}
     __tablename__: str = "habits"
     habit_id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     name: str = Field(max_length=50, nullable=False)
     user_id: uuid.UUID = Field(
-        foreign_key="users.user_id", ondelete="CASCADE", nullable=False
+        foreign_key="habitsior.users.user_id", ondelete="CASCADE", nullable=False
     )
     user: "UserDB" = Relationship(back_populates="habits")
     frequency: List[Weekdays] = Field(sa_column=Column(JSON))

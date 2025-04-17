@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 
 
 class UserDB(SQLModel, table=True):
+    __table_args__ = {"schema": "habitsior"}
     __tablename__: str = "users"
     user_id: uuid.UUID = Field(primary_key=True, default_factory=uuid.uuid4)
     email: str = Field(unique=True, max_length=255, nullable=False)

@@ -9,7 +9,12 @@ if TYPE_CHECKING:
 
 class HabitCompletionDB(SQLModel, table=True):
     __tablename__: str = "habit_completions"
-    __table_args__ = (PrimaryKeyConstraint("habit_id", "date_completed"),)
-    habit_id: uuid.UUID = Field(foreign_key="habits.habit_id", ondelete="CASCADE")
+    __table_args__ = (
+        PrimaryKeyConstraint("habit_id", "date_completed"),
+        {"schema": "habitsior"},
+    )
+    habit_id: uuid.UUID = Field(
+        foreign_key="habitsior.habits.habit_id", ondelete="CASCADE"
+    )
     habit: "HabitDB" = Relationship(back_populates="dates_completed")
     date_completed: date = Field(default_factory=date.today)
