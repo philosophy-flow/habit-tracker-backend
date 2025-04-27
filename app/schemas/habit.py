@@ -1,13 +1,13 @@
 import uuid
 from typing import List, Optional
 from datetime import date, datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from app.models.habit import Weekdays
 
 
 class HabitAdd(BaseModel):
-    name: str
+    name: str = Field(min_length=1, description="must be non-empty")
     frequency: List[Weekdays]
 
 
@@ -32,5 +32,7 @@ class HabitResponseFlat(BaseModel):
 
 
 class HabitUpdate(BaseModel):
-    name: Optional[str] = None
+    name: Optional[str] = Field(
+        None, min_length=1, description="if provided, must be at least 1 char"
+    )
     frequency: Optional[List[Weekdays]] = None
