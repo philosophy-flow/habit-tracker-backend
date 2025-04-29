@@ -19,6 +19,28 @@ async def get_active_user(user: UserDep):
     return user
 
 
-@router.get("/reset-password")
-async def reset_user_password():
-    print("resetting password...")
+@router.patch("/update-password")
+async def update_user_password():
+    return
+    # - payload comes in with existing pw and new pw
+    # - 1st check --> verify db user existence w/ access token
+    # - 2nd check --> encrypt plaintext pw, check against db user encrypted pw
+    # 3. encrypt new pw, update db user with new encrypted pw
+
+
+@router.patch("/update-email")
+async def update_user_email():
+    return
+    # - payload comes in with existing email, new email and plaintext pw
+    # - 1st check --> verify db user existence w/ access token
+    # - 2nd check --> encrypt plaintext pw, check against db user encrypted pw
+    # - update db user with new email
+
+
+@router.patch("/update-username")
+async def update_user_username():
+    return
+    # - payload comes in with existing username, new username and plaintext pw
+    # - 1st check --> verify db user existence w/ access token
+    # - 2nd check --> encrypt plaintext pw, check against db user encrypted pw
+    # - update db user with new username
